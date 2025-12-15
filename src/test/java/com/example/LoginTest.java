@@ -8,8 +8,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.time.Duration;
 
 import static org.junit.Assert.*;
 
@@ -19,9 +22,12 @@ public class LoginTest {
 
     @Before
     public void setUp() {
-        // Set ChromeDriver path if available in system
+        // Set ChromeDriver path for environments where it's not in PATH
         String chromeDriverPath = System.getenv().getOrDefault("CHROMEDRIVER_PATH", "/usr/bin/chromedriver");
-        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+        File chromeDriverFile = new File(chromeDriverPath);
+        if (chromeDriverFile.exists()) {
+            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+        }
         
         // Set up ChromeDriver with headless option for CI/CD environments
         ChromeOptions options = new ChromeOptions();
@@ -63,15 +69,11 @@ public class LoginTest {
         // Click login button
         loginButton.click();
         
-        // Wait a moment for JavaScript to execute
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Wait for message to appear
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WebElement message = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("message")));
         
         // Verify success message
-        WebElement message = driver.findElement(By.id("message"));
         assertTrue(message.isDisplayed());
         assertEquals("Login successful!", message.getText());
         assertTrue(message.getAttribute("class").contains("success"));
@@ -94,15 +96,11 @@ public class LoginTest {
         // Click login button
         loginButton.click();
         
-        // Wait a moment for JavaScript to execute
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Wait for message to appear
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WebElement message = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("message")));
         
         // Verify error message
-        WebElement message = driver.findElement(By.id("message"));
         assertTrue(message.isDisplayed());
         assertEquals("Invalid username or password", message.getText());
         assertTrue(message.getAttribute("class").contains("error"));
