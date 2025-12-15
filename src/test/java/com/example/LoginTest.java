@@ -19,6 +19,10 @@ public class LoginTest {
 
     @Before
     public void setUp() {
+        // Set ChromeDriver path if available in system
+        String chromeDriverPath = System.getenv().getOrDefault("CHROMEDRIVER_PATH", "/usr/bin/chromedriver");
+        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+        
         // Set up ChromeDriver with headless option for CI/CD environments
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
